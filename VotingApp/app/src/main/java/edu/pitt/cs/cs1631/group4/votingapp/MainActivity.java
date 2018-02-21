@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.method.ScrollingMovementMethod;
+//import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+//import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Timer;
@@ -27,21 +27,26 @@ import java.util.TimerTask;
  */
 public class MainActivity extends Activity {
 
-    public static final String TAG = "Input Processor";
+    //??this was input processor
+    public static final String TAG = "VotingApp";
 
-    private static Button connectToServerButton,registerToServerButton
-            ,collectDataButton,sendMessageButton;
+    private static Button connectToServerButton,registerToServerButton ,sendMessageButton;
+           // ,collectDataButton,sendMessageButton;
 
     private EditText serverIp,serverPort;
 
+    private static EditText editText;
+
+
     static ComponentSocket client;
 
-    private static TextView messageReceivedListText;
+    //private static TextView messageReceivedListText;
 
-    private static final String SENDER = "InputProcessor";
+    //private static final String SENDER = "InputProcessor";
+    private static final String SENDER = "VotingApp";
     private static final String REGISTERED = "Registered";
     private static final String DISCOONECTED =  "Disconnect";
-    private static final String SCOPE = "SIS.Scope1";
+    private static final String SCOPE = "SIS";
 
     private KeyValueList readingMessage;
 
@@ -51,6 +56,8 @@ public class MainActivity extends Activity {
 
     String data = null;//"EMG:333ECG:111V";
 
+    private static VotingComponent votingComponent;
+
     static Handler callbacks = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -58,21 +65,31 @@ public class MainActivity extends Activity {
             String[] strs;
             switch (msg.what) {
                 case CONNECTED:
-                    registerToServerButton.setText(REGISTERED);
+                    str = (String)msg.obj;
+                    votingComponent.processMsg(str);
+                    //registerToServerButton.setText(REGISTERED);
+                    System.out.println("hello");
                     Log.e(TAG, "===============================================================CONNECTED" );
                     break;
                 case DISCONNECTED:
-                    connectToServerButton.setText("Connect");
+                    str = (String)msg.obj;
+                    votingComponent.processMsg(str);
+                    //connectToServerButton.setText("Connect");
                     Log.e(TAG, "===============================================================DISCONNECTED" );
                     break;
                 case MESSAGE_RECEIVED:
                     str = (String)msg.obj;
-                    messageReceivedListText.append(str+"********************\n");
+                    votingComponent.processMsg(str);
+
+
+                    //editText.setText(str);
+/*                    str = (String)msg.obj;
+                    //messageReceivedListText.append(str+"********************\n");
                     final int scrollAmount = messageReceivedListText.getLayout().getLineTop(messageReceivedListText.getLineCount()) - messageReceivedListText.getHeight();
                     if (scrollAmount > 0)
                         messageReceivedListText.scrollTo(0, scrollAmount);
                     else
-                        messageReceivedListText.scrollTo(0, 0);
+                        messageReceivedListText.scrollTo(0, 0);*/
                     break;
                 default:
                     super.handleMessage(msg);
@@ -85,6 +102,65 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        editText = (EditText) findViewById(R.id.output);
+        votingComponent = new VotingComponent();
+
+        connectToServerButton = (Button) findViewById(R.id.connectButton);
+        registerToServerButton = (Button) findViewById(R.id.registerButton);
+        sendMessageButton = (Button) findViewById(R.id.sendButton);
+        serverIp = (EditText) findViewById(R.id.ip);
+        serverPort = (EditText) findViewById(R.id.port);
+
+        registerToServerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(client!=null && client.isSocketAlive() && registerToServerButton.getText().toString().equalsIgnoreCase(REGISTERED)){
+                    Toast.makeText(MainActivity.this,"Already registered.",Toast.LENGTH_SHORT).show();
+                }else{
+                    client = new ComponentSocket(serverIp.getText().toString(), Integer.parseInt(serverPort.getText().toString()),callbacks);
+                    client.start();
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            KeyValueList list = generateRegisterMessage();
+                            client.setMessage(list);
+                        }
+                    }, 500);
+
+
+                }
+            }
+        });
+
+        connectToServerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e(MainActivity.TAG, "Sending connectToServerButton.1" );
+                if(connectToServerButton.getText().toString().equalsIgnoreCase(DISCOONECTED)){
+                    Log.e(MainActivity.TAG, "Sending connectToServerButton.2" );
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            client.killThread();
+                        }
+                    }, 100);
+                    connectToServerButton.setText("Connect");
+                }else{
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            KeyValueList list = generateConnectMessage();
+                            client.setMessage(list);
+                        }
+                    }, 100);
+                    connectToServerButton.setText(DISCOONECTED);
+                }
+            }
+        });
 
 
 /*        setContentView(R.layout.content_main);
@@ -128,7 +204,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Log.e(MainActivity.TAG, "Sending connectToServerButton.1" );
-                if(connectToServerButton.getText().toString().equalsIgnoreCase(DISCOONECTED)){
+                if(connectToServerButton.getText().toString().equalsIgnoreCase(DISCONNECTED)){
                     Log.e(MainActivity.TAG, "Sending connectToServerButton.2" );
                     Timer timer = new Timer();
                     timer.schedule(new TimerTask() {
@@ -149,17 +225,18 @@ public class MainActivity extends Activity {
                     }, 100);
                     connectToServerButton.setText(DISCOONECTED);
                 }
-            }
-        });
+/*            }
+        });*//*
         collectDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 readingMessage = generateReadingMessage();
             }
-        });
+        });*/
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                readingMessage = generateReadingMessage();
                 if(client!=null && client.isSocketAlive() && readingMessage.size()>0){
                     Timer timer = new Timer();
                     timer.schedule(new TimerTask() {
@@ -173,13 +250,48 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this,"Please generate a message first.", Toast.LENGTH_SHORT).show();
                 }
             }
-        });*/
+        });
     }
 
+    public static void setText(String text)
+    {
+        String current = editText.getText().toString();
+        //current += "/n";
+
+        if(current != null) current += text;
+        else current = text;
+        if(text != null) editText.setText(current);
+    }
+
+    public class VotingComponent {
+
+        public VotingComponent()
+        {
+        }
+
+        public boolean processMsg(String message)
+        {
+            setText(message);
+/*                client = new ComponentSocket(serverIp.getText().toString(), Integer.parseInt(serverPort.getText().toString()),callbacks);
+                client.start();
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        KeyValueList list = generateConfirmMessage();
+                        client.setMessage(list);
+                    }
+                }, 500);*/
+
+
+
+            return false;
+        }
+    }
 
     //Generate a test register message, please replace something of attributes with your own.
 
-/*    KeyValueList generateRegisterMessage(){
+    KeyValueList generateRegisterMessage(){
         KeyValueList list = new KeyValueList();
         //Set the scope of the message
         list.putPair("Scope",SCOPE);
@@ -192,12 +304,12 @@ public class MainActivity extends Activity {
         //Set the name of the component
         list.putPair("Name",SENDER);
         return list;
-    }*/
+    }
 
 
     //Generate a test connect message, please replace something of attributes with your own.
 
-/*    KeyValueList generateConnectMessage(){
+    KeyValueList generateConnectMessage(){
         KeyValueList list = new KeyValueList();
         //Set the scope of the message
         list.putPair("Scope",SCOPE);
@@ -210,12 +322,22 @@ public class MainActivity extends Activity {
         //Set the name of the component
         list.putPair("Name",SENDER);
         return list;
-    }*/
+    }
 
 
     //Generate a test register message, please replace something of attributes with your own.
 
-/*    KeyValueList generateReadingMessage(){
+    KeyValueList generateReadingMessage(){
+/*        KeyValueList list = new KeyValueList();
+        //Set the scope of the message
+        list.putPair("Scope",SCOPE);
+        //Set the message type
+        list.putPair("MessageType","Basic");
+        //Set the sender or name of the message
+        list.putPair("Sender",SENDER);
+        //Set the role of the message
+        list.putPair("Role","Basic");*/
+
         KeyValueList list = new KeyValueList();
         //Set the scope of the message
         list.putPair("Scope",SCOPE);
@@ -224,10 +346,17 @@ public class MainActivity extends Activity {
         //Set the sender or name of the message
         list.putPair("Sender",SENDER);
         //Set the role of the message
-        list.putPair("Role","Basic");
+        //list.putPair("Role","Basic");
+        //Set the name of the component
+        //list.putPair("Name",SENDER);
+
+        list.putPair("Receiver", "PrjRemote");
+        //return list;
+
+        //list.putPair("Message", "Hello");
 
         //the following three attributes are necessary for sending the message to Uploader through PC SIS server.
-        list.putPair("Broadcast", "True");
+/*        list.putPair("Broadcast", "True");
         list.putPair("Direction", "Up");
         list.putPair("Receiver", "Uploader");
 
@@ -248,12 +377,24 @@ public class MainActivity extends Activity {
             list.putPair("Data_ECG", ecg);
         }
 
-        list.putPair("Data_Pulse", "unavailable");
+        list.putPair("Data_Pulse", "unavailable");*/
 
         long curr_time = System.currentTimeMillis();
         list.putPair("Data_Date", String.valueOf(curr_time));
         return list;
-    }*/
+    }
+
+    KeyValueList generateConfirmMessage() {
+        KeyValueList list = new KeyValueList();
+        //Set the scope of the message
+        list.putPair("Scope",SCOPE);
+        //Set the message type
+        list.putPair("MessageType","Confirm");
+        //Set the sender or name of the message
+        list.putPair("Sender",SENDER);
+        list.putPair("Receiver", "PrjRemote");
+        return list;
+    }
 
 }
 

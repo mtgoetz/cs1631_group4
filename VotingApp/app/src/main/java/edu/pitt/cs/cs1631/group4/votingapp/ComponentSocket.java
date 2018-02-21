@@ -68,6 +68,7 @@ class ComponentSocket extends Thread {
                         Message msg = callback.obtainMessage(MainActivity.MESSAGE_RECEIVED);
                         msg.obj = kvList.toString();
                         callback.sendMessage(msg);
+                        //MainActivity.VotingComponent.processMsg(msg);
                     }
                 }
             } catch (Exception e) {
