@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 //import android.widget.TextView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,7 +38,7 @@ public class MainActivity extends Activity {
 
     private EditText serverIp,serverPort;
 
-    private static EditText editText;
+    private static TextView editText;
 
 
     static ComponentSocket client;
@@ -68,7 +71,7 @@ public class MainActivity extends Activity {
                     str = (String)msg.obj;
                     votingComponent.processMsg(str);
                     //registerToServerButton.setText(REGISTERED);
-                    System.out.println("hello");
+                    //System.out.println("hello");
                     Log.e(TAG, "===============================================================CONNECTED" );
                     break;
                 case DISCONNECTED:
@@ -102,7 +105,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editText = (EditText) findViewById(R.id.output);
+        editText = (TextView) findViewById(R.id.output);
         votingComponent = new VotingComponent();
 
         connectToServerButton = (Button) findViewById(R.id.connectButton);
@@ -338,7 +341,7 @@ public class MainActivity extends Activity {
         //Set the role of the message
         list.putPair("Role","Basic");*/
 
-        KeyValueList list = new KeyValueList();
+/*        KeyValueList list = new KeyValueList();
         //Set the scope of the message
         list.putPair("Scope",SCOPE);
         //Set the message type
@@ -350,8 +353,27 @@ public class MainActivity extends Activity {
         //Set the name of the component
         //list.putPair("Name",SENDER);
 
+        list.putPair("Receiver", "PrjRemote");*/
+
+        KeyValueList list = new KeyValueList();
+        //Set the scope of the message
+        list.putPair("Scope",SCOPE);
+        //Set the message type
+        list.putPair("MessageType","Alert");
+        //Set the sender or name of the message
+        list.putPair("Sender",SENDER);
+        //Set the role of the message
+        //list.putPair("Role","Basic");
+        //Set the name of the component
+        //list.putPair("Name",SENDER);
+
         list.putPair("Receiver", "PrjRemote");
-        //return list;
+        list.putPair("Key", "4321");
+
+        Log.d(MainActivity.TAG, "Message to send: " + list.toString());
+        long curr_time = System.currentTimeMillis();
+        list.putPair("Data", String.valueOf(curr_time));
+        return list;
 
         //list.putPair("Message", "Hello");
 
@@ -379,9 +401,9 @@ public class MainActivity extends Activity {
 
         list.putPair("Data_Pulse", "unavailable");*/
 
-        long curr_time = System.currentTimeMillis();
+/*        long curr_time = System.currentTimeMillis();
         list.putPair("Data_Date", String.valueOf(curr_time));
-        return list;
+        return list;*/
     }
 
     KeyValueList generateConfirmMessage() {
