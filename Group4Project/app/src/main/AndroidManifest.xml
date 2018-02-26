@@ -18,10 +18,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".ResultsActivity"></activity>
-
-        <receiver android:name=".ResultsActivity$VoteReceiver" android:exported="true" android:enabled="true">
-            <intent-filter android:priority="999999999">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+        
+        <receiver android:name=".ResultsActivity$VoteReceiver" android:exported="true" android:enabled="true"
+            android:permission="android.permission.BROADCAST_SMS" >
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_DELIVER"/>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED_ACTION"/>
             </intent-filter>
         </receiver>
 

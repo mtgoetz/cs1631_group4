@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 /**
  * Created by mthom on 2/23/2018.
  */
 
 public class VoteReceiver extends BroadcastReceiver {
+
 
     public VoteReceiver()
     {
@@ -19,25 +21,33 @@ public class VoteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        goAsync();
         Bundle bundle = intent.getExtras();
         SmsMessage[] msg;
-        String phoneNumber;
+        long phoneNumber;
         int selection;
 
-        if(bundle != null){
+        Log.d("sms received", "Intent recieved: " + intent.getAction());
+        if(bundle != null && intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
             Object[] pdus = (Object[])bundle.get("pdus");
             msg = new SmsMessage[pdus.length];
             for(int i = 0; i < msg.length; i++){
                 try{
-                msg[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-                phoneNumber = msg[i].getOriginatingAddress();
+                    msg[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+                    phoneNumber = Long.parseLong(msg[i].getOriginatingAddress());
 
-                selection = Integer.parseInt(msg[i].getMessageBody().toString());
+                    selection = Integer.parseInt(msg[i].getDisplayMessageBody().toString());
 
 
+
+                    //ResultsActivity.vote(phoneNumber, selection);
+
+                    //int status = service.castVote(phoneNumber, selection);
+                    abortBroadcast();
                 } catch (Exception e) {
 
                     //add error code here
+                    abortBroadcast();
                     return;
                 }
             }
@@ -49,3 +59,4 @@ public class VoteReceiver extends BroadcastReceiver {
 
     }
 }
+

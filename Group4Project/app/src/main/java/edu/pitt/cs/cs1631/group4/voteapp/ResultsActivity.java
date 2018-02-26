@@ -1,10 +1,12 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +28,10 @@ public class ResultsActivity extends AppCompatActivity {
     ArrayAdapter<String> displayResults;
     ArrayList<String> list;
     VotingService service;
+    final int RESULT_SUCCESS = 0;
+    final int RESULT_INVALID = 1;
+    final int RESULT_DUPLICATE = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,17 +104,39 @@ public class ResultsActivity extends AppCompatActivity {
         //start broadcast receiver.
     }
 
+/*    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        unregisterReceiver(VoteReceiver);
+    }*/
+
     public void vote(Long userPhoneNum, int ContestantId){
         int result = service.castVote(userPhoneNum, ContestantId);
 
+        String phoneNumber = userPhoneNum.toString();
 
 
         //do something with the result.
         //0 = success
         //1 = invalid choice
         //2 = double vote.
-
-
+        String message;
+        if(result == RESULT_SUCCESS)
+        {
+            message = "vote recorded";
+        }
+        else if(result == RESULT_INVALID)
+        {
+            message = "choice invalid, please try again.";
+        }
+        else
+        {
+            message = "only one vote allowed per user.";
+        }
+/*            PendingIntent pi = PendingIntent.getActivity(this, 0,
+                    new Intent(this, VoteReceiver.class), 0);*/
+            SmsManager sms = SmsManager.getDefault();
+            sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
     public class VoteReceiver extends BroadcastReceiver {
@@ -127,7 +155,7 @@ public class ResultsActivity extends AppCompatActivity {
             int selection;
 
             Log.d("sms received", "Intent recieved: " + intent.getAction());
-            if(bundle != null && intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
+            if(bundle != null){
                 Object[] pdus = (Object[])bundle.get("pdus");
                 msg = new SmsMessage[pdus.length];
                 for(int i = 0; i < msg.length; i++){
@@ -135,7 +163,9 @@ public class ResultsActivity extends AppCompatActivity {
                         msg[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                         phoneNumber = Long.parseLong(msg[i].getOriginatingAddress());
 
-                        selection = Integer.parseInt(msg[i].getMessageBody().toString());
+                        selection = Integer.parseInt(msg[i].getDisplayMessageBody().toString());
+
+
 
                         vote(phoneNumber, selection);
 
