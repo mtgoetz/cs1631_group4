@@ -32,7 +32,9 @@ public class VoteReceiver extends BroadcastReceiver {
                 msg[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                 phoneNumber = msg[i].getOriginatingAddress();
 
-                    selection = Integer.parseInt(msg[i].getMessageBody().toString());
+                selection = Integer.parseInt(msg[i].getMessageBody().toString());
+
+
                 } catch (Exception e) {
 
                     //add error code here

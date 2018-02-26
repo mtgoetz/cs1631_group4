@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">VoteApp</string>
+    <string name="results">Results</string>
 </resources>

@@ -18,8 +18,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".ResultsActivity"></activity>
+
+        <receiver android:name=".ResultsActivity$VoteReceiver" android:exported="true" android:enabled="true">
+            <intent-filter android:priority="999999999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
-    <uses-permission android:name="android.permission.RECEIVE_SMS">
-    </uses-permission>
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
 
 </manifest>
