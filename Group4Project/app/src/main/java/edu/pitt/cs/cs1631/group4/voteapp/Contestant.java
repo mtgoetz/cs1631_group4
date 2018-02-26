@@ -1,12 +1,15 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 /**
  * Created by Daniel Rowe on 2/25/2018.
  */
 
-public class Contestant{
+public class Contestant {
     private String name;
     private int id;
 
@@ -35,6 +38,7 @@ public class Contestant{
         this("", id);
     }
 
+
     public String getName() {
         return name;
     }
@@ -50,4 +54,5 @@ public class Contestant{
     public void setId(int id) {
         this.id = id;
     }
+
 }
