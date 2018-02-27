@@ -1,9 +1,14 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -14,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +34,7 @@ public class ResultsActivity extends AppCompatActivity {
     ArrayAdapter<String> displayResults;
     ArrayList<String> list;
     VotingService service;
+    VoteReceiver receiver;
     final int RESULT_SUCCESS = 0;
     final int RESULT_INVALID = 1;
     final int RESULT_DUPLICATE = 2;
@@ -38,6 +45,18 @@ public class ResultsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
 
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != 0)
+        {
+            int x = 1;
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, x);
+        }
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != 0)
+        {
+            Toast.makeText(this, "No permission", Toast.LENGTH_SHORT).show();
+
+        }
+
         resultsView = (ListView)findViewById(R.id.resultsList);
         previewButton = (Button)findViewById(R.id.previewButton);
         stopButton = (Button) findViewById(R.id.stopButton);
@@ -46,6 +65,16 @@ public class ResultsActivity extends AppCompatActivity {
         displayResults = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
         resultsView.setAdapter(displayResults);
         service = new VotingService();
+        receiver = new VoteReceiver(service);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        filter.addAction("android.provider.Telephony.RECEIVE_SMS");
+        //listener = new VoteReceiver();
+        this.registerReceiver(receiver, filter);
+
+        //register receiver and init with service as argument.
+        //then fix service code to toggle listening etc.
+
         service.toggleListening();
 
         ArrayList<String> l = this.getIntent().getStringArrayListExtra("theList");
@@ -104,11 +133,11 @@ public class ResultsActivity extends AppCompatActivity {
         //start broadcast receiver.
     }
 
-/*    @Override
+    @Override
     public void onDestroy(){
         super.onDestroy();
-        unregisterReceiver(VoteReceiver);
-    }*/
+        unregisterReceiver(receiver);
+    }
 
     public void vote(Long userPhoneNum, int ContestantId){
         int result = service.castVote(userPhoneNum, ContestantId);
@@ -139,51 +168,6 @@ public class ResultsActivity extends AppCompatActivity {
             sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
-    public class VoteReceiver extends BroadcastReceiver {
 
-        public VoteReceiver()
-        {
-            super();
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            goAsync();
-            Bundle bundle = intent.getExtras();
-            SmsMessage[] msg;
-            long phoneNumber;
-            int selection;
-
-            Log.d("sms received", "Intent recieved: " + intent.getAction());
-            if(bundle != null){
-                Object[] pdus = (Object[])bundle.get("pdus");
-                msg = new SmsMessage[pdus.length];
-                for(int i = 0; i < msg.length; i++){
-                    try{
-                        msg[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-                        phoneNumber = Long.parseLong(msg[i].getOriginatingAddress());
-
-                        selection = Integer.parseInt(msg[i].getDisplayMessageBody().toString());
-
-
-
-                        vote(phoneNumber, selection);
-
-                        //int status = service.castVote(phoneNumber, selection);
-                        abortBroadcast();
-                    } catch (Exception e) {
-
-                        //add error code here
-                        abortBroadcast();
-                        return;
-                    }
-                }
-            }
-
-            //send these as a vote...
-
-
-
-        }
-    }
 }
+
