@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.widget.Toast;
+
+import javax.xml.transform.Result;
 
 public class VoteReceiver extends BroadcastReceiver {
     final int RESULT_SUCCESS = 0;
@@ -64,6 +67,7 @@ public class VoteReceiver extends BroadcastReceiver {
                     }
                     SmsManager sms = SmsManager.getDefault();
                     sms.sendTextMessage(userphoneNumber, null, message, null, null);
+                    Toast.makeText(context.getApplicationContext(), "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
                     abortBroadcast();
                 } catch (Exception e) {
 

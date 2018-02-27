@@ -166,6 +166,10 @@ public class ResultsActivity extends AppCompatActivity {
                     new Intent(this, VoteReceiver.class), 0);*/
             SmsManager sms = SmsManager.getDefault();
             sms.sendTextMessage(phoneNumber, null, message, null, null);
+
+            //make sure this works
+
+            Toast.makeText(this, "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
     }
 
 
