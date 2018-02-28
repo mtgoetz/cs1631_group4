@@ -1,9 +1,13 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -27,8 +31,8 @@ public class VoteReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         //Toast.makeText(getApplicationContext(), "sms received", Toast.LENGTH_LONG).show();
-
-        goAsync();
+        if(!service.isListening()) return;
+        //goAsync();
         Bundle bundle = intent.getExtras();
         SmsMessage[] msg;
         long phoneNumber;
@@ -65,13 +69,17 @@ public class VoteReceiver extends BroadcastReceiver {
                     {
                         message = "only one vote allowed per user.";
                     }
+                    if(ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != 0)
+                    {
+                        int x = 1;
+                        ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.SEND_SMS}, x);
+                    }
                     SmsManager sms = SmsManager.getDefault();
                     sms.sendTextMessage(userphoneNumber, null, message, null, null);
-                    Toast.makeText(context.getApplicationContext(), "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
-                    abortBroadcast();
+                    Toast.makeText(context, "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
+                    //abortBroadcast();
                 } catch (Exception e) {
-
-                    //add error code here
+                    Log.e("receiver", e.getMessage());
                     //abortBroadcast();
                     return;
                 }

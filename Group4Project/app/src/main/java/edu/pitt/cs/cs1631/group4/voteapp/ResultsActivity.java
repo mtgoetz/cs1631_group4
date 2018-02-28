@@ -60,7 +60,6 @@ public class ResultsActivity extends AppCompatActivity {
         resultsView = (ListView)findViewById(R.id.resultsList);
         previewButton = (Button)findViewById(R.id.previewButton);
         stopButton = (Button) findViewById(R.id.stopButton);
-        //table = new TallyTable();
         list = new ArrayList<>();
         displayResults = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
         resultsView.setAdapter(displayResults);
@@ -69,11 +68,8 @@ public class ResultsActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.provider.Telephony.SMS_RECEIVED");
         filter.addAction("android.provider.Telephony.RECEIVE_SMS");
-        //listener = new VoteReceiver();
-        this.registerReceiver(receiver, filter);
 
-        //register receiver and init with service as argument.
-        //then fix service code to toggle listening etc.
+        this.registerReceiver(receiver, filter);
 
         service.toggleListening();
 
@@ -92,7 +88,6 @@ public class ResultsActivity extends AppCompatActivity {
         previewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //displayResults.add("hello");
 
                 //iterate and display
                 displayResults.clear();
@@ -128,9 +123,6 @@ public class ResultsActivity extends AppCompatActivity {
                 displayResults.notifyDataSetChanged();
             }
         });
-
-        //iterate intent for entries into list
-        //start broadcast receiver.
     }
 
     @Override
@@ -162,14 +154,11 @@ public class ResultsActivity extends AppCompatActivity {
         {
             message = "only one vote allowed per user.";
         }
-/*            PendingIntent pi = PendingIntent.getActivity(this, 0,
-                    new Intent(this, VoteReceiver.class), 0);*/
-            SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(phoneNumber, null, message, null, null);
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(phoneNumber, null, message, null, null);
 
-            //make sure this works
-
-            Toast.makeText(this, "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
+        //For demo to show text was sent.
+        Toast.makeText(this, "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
     }
 
 

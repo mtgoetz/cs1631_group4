@@ -30,9 +30,7 @@ public class MainActivity extends AppCompatActivity {
     static ArrayAdapter<String> entries;
     ArrayList<String> list;
     Button clearButton;
-    //private static Map<String, Integer> buildList;
     Button startButton;
-    //Context context;
     ArrayList<String> contestants;
 
 
@@ -52,9 +50,6 @@ public class MainActivity extends AppCompatActivity {
         startButton = (Button) findViewById(R.id.startButton);
         contestants = new ArrayList<>();
 
-
-
-
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,17 +59,9 @@ public class MainActivity extends AppCompatActivity {
                 String name = nameInput.getText().toString();
                 String id = idInput.getText().toString();
                 int idInt = Integer.parseInt(id);
-
-
-
                 //add to map
-                //buildList.put(name, Integer.valueOf(id));
-                //Contestant newContestant = new Contestant(name, Integer.parseInt(id));
-                //contestants.add(newContestant);
                 contestants.add(name);
-                contestants.add(id.toString());
-                //list.add(name);
-                //list.add(id.toString());
+                contestants.add(id.toString());;
                 //add to display
                 String toList = name + "\t\t:\t\t" + id;
                 entries.add(toList);
@@ -85,10 +72,7 @@ public class MainActivity extends AppCompatActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //list = new list
                 list = new ArrayList<String>();
-                //buildList.clear();
-                //entries = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, list);
                 entries.clear();
                 entries.notifyDataSetChanged();
             }
@@ -98,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent startVote = new Intent(MainActivity.this, ResultsActivity.class);
-                //startVote.putParcelableArrayListExtra((ArrayList<Parcelable>)contestants);
                 startVote.putStringArrayListExtra("theList", contestants);
                 startActivity(startVote);
             }
