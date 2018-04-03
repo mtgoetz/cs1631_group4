@@ -1,27 +1,21 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
-import android.app.Activity;
-import android.app.LauncherActivity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = "VotingApp";
+    public static final int CONNECTED = 1;
+    public static final int DISCONNECTED = 2;
+    public static final int MESSAGE_RECEIVED = 3;
 
     EditText nameInput;
     EditText idInput;
