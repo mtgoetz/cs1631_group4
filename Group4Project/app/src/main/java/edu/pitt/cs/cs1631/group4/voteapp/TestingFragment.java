@@ -1,6 +1,7 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
+import java.io.File;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class TestingFragment extends Fragment {
@@ -38,7 +44,7 @@ public class TestingFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_testing, container, false);
@@ -58,6 +64,18 @@ public class TestingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //TODO: load a premade test sequence
+/*                try {
+                    File directory = getContext().getFilesDir();
+                    File loadSeq = new File(directory, "savedSequence");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }*/
+                SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", MODE_PRIVATE);
+                String savedSeq = sharedPref.getString("savedSequence", null);
+
+                Toast.makeText(getContext(), savedSeq, Toast.LENGTH_LONG);
+
+
             }
         });
 
@@ -66,6 +84,7 @@ public class TestingFragment extends Fragment {
             public void onClick(View v) {
                 Fragment newTest = new MakeTestFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
+                        .addToBackStack("testing")
                         .replace(R.id.main_frag_container, newTest)
                         .commit();
             }

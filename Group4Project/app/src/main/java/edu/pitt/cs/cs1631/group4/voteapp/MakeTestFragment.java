@@ -1,14 +1,22 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
+import android.app.LauncherActivity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import java.io.FileOutputStream;
+
+import java.io.FileOutputStream;
 
 public class MakeTestFragment extends Fragment {
 
@@ -74,6 +82,48 @@ public class MakeTestFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //TODO: save sequence to phone - will run at load
+
+/*                String filename = "savedSequence";
+
+                //TODO: this will be what is saved
+                String fileContents = "Sample saved file";
+
+                FileOutputStream outputStream;
+
+                try {
+                    outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
+                    outputStream.write(fileContents.getBytes());
+                    outputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }*/
+
+                //this will do to save one sequence
+                String fileContents = "Sample saved file";
+
+
+
+
+                //IDK if this will work
+/*                View item;
+
+                String s = "";
+                EditText e;
+                for(int i = 0; i < listView.getCount(); i++) {
+                    item = listView.getChildAt(i);
+                    s += item.toString();
+                    s += ";";
+                }*/
+
+
+
+
+                SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("savedSequence", fileContents);
+                editor.commit();
+
+                getActivity().onBackPressed();
             }
         });
 
@@ -84,6 +134,21 @@ public class MakeTestFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main_frag_container, testing)
                         .commit();
+            }
+        });
+
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
+        rootView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                //Log.i(tag, "keyCode: " + keyCode);
+                if( keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                    //Log.i(tag, "onKey Back listener is working!!!");
+                    getFragmentManager().popBackStack("testing", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    return true;
+                }
+                return false;
             }
         });
 
