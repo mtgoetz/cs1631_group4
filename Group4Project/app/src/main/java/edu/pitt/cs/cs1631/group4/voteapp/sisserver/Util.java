@@ -1,4 +1,4 @@
-package edu.pitt.cs.cs1631.group4.voteapp;
+package edu.pitt.cs.cs1631.group4.voteapp.sisserver;
 
 import android.util.Log;
 
@@ -60,7 +60,6 @@ class NetTool {
 
         return null;
     }
-
     public static String getIpAddress() {
         String ip = "";
         try {
@@ -174,7 +173,7 @@ class KeyValueList {
 
     /*
      * encode the KeyValueList into a String
-	 */
+     */
     public String encodedString() {
 
         StringBuilder builder = new StringBuilder();
