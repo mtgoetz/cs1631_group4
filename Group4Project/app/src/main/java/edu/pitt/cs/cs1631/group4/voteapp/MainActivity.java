@@ -9,6 +9,7 @@ import android.net.wifi.WifiInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +34,7 @@ import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ServerService;
 public class MainActivity extends AppCompatActivity {
 
 
-    Button startServerButton;
+    TextView statusText;
     TextView iptext;
 
 
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     //button
-                    startServerButton.setText(STOP_SERVER);
+                    //startServerButton.setText(STOP_SERVER);
                     break;
                 case NEW_COMPONENT_REGISTERED:
                     str = (String) msg.obj;
@@ -123,22 +124,50 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
-
-
-
-
-
     private ServiceConnection mConnection = null;
+
+
+/*    public interface Status {
+        //1 = connected
+        //2 = disconnected
+        //3 = testing
+        //4 = voting
+        //5 = reporting
+        //6 = error
+        public void updateStatus(int status);
+    }*/
+
+    public void updateStatus(int status) {
+        if(statusText == null) statusText = (TextView) findViewById(R.id.main_status_text);
+        switch(status){
+            case 1:
+                statusText.setText("CONNECTED");
+                break;
+            case 2:
+                statusText.setText("DISCONNECTED");
+                break;
+            case 3:
+                statusText.setText("TESTING");
+                break;
+            case 4:
+                statusText.setText("VOTING");
+                break;
+            case 5:
+                statusText.setText("REPORTING");
+                break;
+            default:
+                statusText.setText("ERROR");
+                //error
+        }
+    }
+
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
-
 
         //Instantiate server background service
         serverService = new ServerService();
@@ -147,48 +176,20 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-
-
-
-
-
-
-        //normal code for voting app UI
         setContentView(R.layout.activity_main);
 
-
-        ///End normal code for Voting App UI
-
-
-
         //this starts the sisServer
-        //doBindService();
+        doBindService();
 
+        iptext = (TextView)findViewById(R.id.main_port_text);
+        statusText = (TextView) findViewById(R.id.main_status_text);
 
-        startServerButton = (Button)findViewById(R.id.start_server_button);
-        startServerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mConnection == null) doBindService();
-            }
-        });
+        Fragment home = new HomeFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_frag_container, home)
+                .commit();
 
-        iptext = (TextView)findViewById(R.id.ip_text);
     }
-
-
-
-    //////////////////To move////////////////////
-
-
-
-
-
-    //is this how to connect????   see sisclientlistactivity code/////////////
-
-
-
-
 
 
     @Override
@@ -253,7 +254,9 @@ public class MainActivity extends AppCompatActivity {
                 serverService.startServer("8000");
                 //Display the listening IP and port
                 String ip = NetTool.getIpAddress();
-                iptext.setText(ip + ": 8000");
+                String display = "IP: " + ip + " Port: 8000";
+                iptext.setText(display);
+                updateStatus(1);
                 Toast.makeText(MainActivity.this, "SISServer connected.", Toast.LENGTH_SHORT).show();
             }
             //Callled when the server service is disconnected.

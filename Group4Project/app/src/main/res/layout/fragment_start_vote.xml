@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.pitt.cs.cs1631.group4.voteapp.MainActivity">
+    tools:context="edu.pitt.cs.cs1631.group4.voteapp.MainActivity"
+    android:background="@color/colorWhite">
 
     <TextView
         android:id="@+id/textView"
@@ -35,7 +36,7 @@
         android:layout_width="82dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:ems="10"
+        android:ems="12"
         android:hint="#"
         android:inputType="number"
         android:singleLine="false"
