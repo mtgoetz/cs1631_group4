@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -30,6 +31,11 @@ import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ClientInfo;
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ServerService;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    Button startServerButton;
+    TextView iptext;
+
 
     private ServerService serverService;
     /**
@@ -73,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     //button
-                    startButton.setText(STOP_SERVER);
+                    startServerButton.setText(STOP_SERVER);
                     break;
                 case NEW_COMPONENT_REGISTERED:
                     str = (String) msg.obj;
@@ -120,17 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //this will have to move///////////////////////////////
 
-    EditText nameInput;
-    EditText idInput;
-    Button addButton;
-    ListView contestantList;
-    static ArrayAdapter<String> entries;
-    ArrayList<String> list;
-    Button clearButton;
-    Button startButton;
-    ArrayList<String> contestants;
 
 
     private ServiceConnection mConnection = null;
@@ -151,8 +147,7 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        //this starts the sisServer
-        doBindService();
+
 
 
 
@@ -161,54 +156,24 @@ public class MainActivity extends AppCompatActivity {
         //normal code for voting app UI
         setContentView(R.layout.activity_main);
 
-        nameInput = (EditText)findViewById(R.id.textName);
-        idInput = (EditText)findViewById(R.id.enterID);
-        addButton = (Button) findViewById(R.id.addButton);
-        contestantList = (ListView)findViewById(R.id.listAdded);
-        list = new ArrayList<String>();
-        entries = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-        contestantList.setAdapter(entries);
-        clearButton = (Button) findViewById(R.id.clearButton);
-        startButton = (Button) findViewById(R.id.startButton);
-        contestants = new ArrayList<>();
 
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(nameInput.getText().toString().matches("")) return;
-                if(idInput.getText().toString().matches("")) return;
-                //else add to list and display
-                String name = nameInput.getText().toString();
-                String id = idInput.getText().toString();
-                int idInt = Integer.parseInt(id);
-                //add to map
-                contestants.add(name);
-                contestants.add(id.toString());;
-                //add to display
-                String toList = name + "\t\t:\t\t" + id;
-                entries.add(toList);
-                entries.notifyDataSetChanged();
-            }
-        });
-
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                list = new ArrayList<String>();
-                entries.clear();
-                entries.notifyDataSetChanged();
-            }
-        });
-
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent startVote = new Intent(MainActivity.this, ResultsActivity.class);
-                startVote.putStringArrayListExtra("theList", contestants);
-                startActivity(startVote);
-            }
-        });
         ///End normal code for Voting App UI
+
+
+
+        //this starts the sisServer
+        //doBindService();
+
+
+        startServerButton = (Button)findViewById(R.id.start_server_button);
+        startServerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mConnection == null) doBindService();
+            }
+        });
+
+        iptext = (TextView)findViewById(R.id.ip_text);
     }
 
 
@@ -234,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
         AppIndex.AppIndexApi.start(client, getIndexApiAction());
+        //if(mConnection == null) doBindService();
     }
 
     @Override
@@ -244,11 +210,6 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
-
-
-
-
-
     }
 
 
@@ -292,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                 serverService.startServer("8000");
                 //Display the listening IP and port
                 String ip = NetTool.getIpAddress();
-                //portText.setText(ip + ":" + port);
+                iptext.setText(ip + ": 8000");
                 Toast.makeText(MainActivity.this, "SISServer connected.", Toast.LENGTH_SHORT).show();
             }
             //Callled when the server service is disconnected.
@@ -303,16 +264,6 @@ public class MainActivity extends AppCompatActivity {
         };
         bindService(new Intent(MainActivity.this,
                 ServerService.class), mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    private static String getIpAddress(WifiInfo wifiInfo) {
-        String result;
-        int ip = wifiInfo.getIpAddress();
-
-        result = String.format("%d.%d.%d.%d", (ip & 0xff), (ip >> 8 & 0xff), (ip >> 16 & 0xff),
-                (ip >> 24 & 0xff));
-
-        return result;
     }
 
     void stopService() {

@@ -6,86 +6,17 @@
     android:layout_height="match_parent"
     tools:context="edu.pitt.cs.cs1631.group4.voteapp.MainActivity">
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start server"
+        android:gravity="center"
+        android:id="@+id/start_server_button"/>
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Add a Contestant:"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteY="7dp" />
-
-    <EditText
-        android:id="@+id/textName"
-        android:layout_width="189dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Name"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <EditText
-        android:id="@+id/enterID"
-        android:layout_width="82dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:ems="10"
-        android:hint="#"
-        android:inputType="number"
-        android:singleLine="false"
-        app:layout_constraintBottom_toBottomOf="@+id/textName"
-        app:layout_constraintEnd_toStartOf="@+id/addButton"
-
-        app:layout_constraintHorizontal_bias="0.111"
-        app:layout_constraintStart_toEndOf="@+id/textName" />
-
-    <ListView
-        android:id="@+id/listAdded"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="2dp"
-        android:background="@drawable/black_border"
-        app:layout_constraintBottom_toTopOf="@+id/clearButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textName" />
-
-    <Button
-        android:id="@+id/clearButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:text="Clear"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/listAdded"
-        app:layout_constraintTop_toBottomOf="@+id/listAdded"
-        app:layout_constraintVertical_bias="0" />
-
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:text="Start"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/listAdded"
-        app:layout_constraintTop_toTopOf="@+id/clearButton"
-        app:layout_constraintVertical_bias="0" />
-
-    <Button
-        android:id="@+id/addButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add"
-        app:layout_constraintBottom_toBottomOf="@+id/enterID"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/enterID" />
+        android:id="@+id/ip_text"
+        app:layout_constraintTop_toBottomOf="@id/start_server_button"/>
 
 
 </android.support.constraint.ConstraintLayout>
