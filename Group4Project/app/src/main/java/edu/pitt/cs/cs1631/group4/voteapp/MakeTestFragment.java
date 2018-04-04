@@ -4,27 +4,29 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 
-
-public class HomeFragment extends Fragment {
-
-    Button newPollButton;
-    Button testButton;
+public class MakeTestFragment extends Fragment {
 
     //private OnFragmentInteractionListener mListener;
 
-    public HomeFragment() {
+    Button addStart;
+    Button addVote;
+    Button addStop;
+    ListView listView;
+    Button saveButton;
+    Button cancelButton;
+
+    public MakeTestFragment() {
         // Required empty public constructor
     }
 
-    public static HomeFragment newInstance() {
-        HomeFragment fragment = new HomeFragment();
+    public static MakeTestFragment newInstance() {
+        MakeTestFragment fragment = new MakeTestFragment();
         Bundle args = new Bundle();
         return fragment;
     }
@@ -38,51 +40,52 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_make_test, container, false);
 
-        newPollButton = (Button) rootView.findViewById(R.id.newPoll_button);
-        testButton = (Button) rootView.findViewById(R.id.homescree_test_button);
+        addStart = (Button) rootView.findViewById(R.id.add_start_button);
+        addVote = (Button) rootView.findViewById(R.id.add_vote_button);
+        addStop = (Button) rootView.findViewById(R.id.add_stop_button);
+        listView = (ListView) rootView.findViewById(R.id.make_list);
+        saveButton = (Button) rootView.findViewById(R.id.make_save_button);
+        cancelButton = (Button) rootView.findViewById(R.id.make_cancel_button);
 
-        newPollButton.setOnClickListener(new View.OnClickListener() {
+        addStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: start voting fragment
-                Fragment voting = new StartVoteFragment();
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frag_container, voting)
-                        .addToBackStack("home")
-                        .commit();
+                //TODO: add start event to sequence and listview
             }
         });
 
-        testButton.setOnClickListener(new View.OnClickListener() {
+        addVote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: start testing fragment
+                //TODO: add random vote to seq and listview
+            }
+        });
+
+        addStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: add stop event to seq and listview
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: save sequence to phone - will run at load
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 Fragment testing = new TestingFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main_frag_container, testing)
-                        .addToBackStack("home")
                         .commit();
             }
         });
-
-        //for back press
-        rootView.setFocusableInTouchMode(true);
-        rootView.requestFocus();
-        rootView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                //Log.i(tag, "keyCode: " + keyCode);
-                if( keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                    //Log.i(tag, "onKey Back listener is working!!!");
-                    getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    return true;
-                }
-                return false;
-            }
-        });
-
 
         return rootView;
     }

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,19 +13,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 
-public class HomeFragment extends Fragment {
-
-    Button newPollButton;
-    Button testButton;
+public class TestingFragment extends Fragment {
 
     //private OnFragmentInteractionListener mListener;
 
-    public HomeFragment() {
+    Button defaultTestButton;
+    Button loadSequenceButton;
+    Button createSequencebutton;
+    private View rootView;
+
+    public TestingFragment() {
         // Required empty public constructor
     }
 
-    public static HomeFragment newInstance() {
-        HomeFragment fragment = new HomeFragment();
+    public static TestingFragment newInstance() {
+        TestingFragment fragment = new TestingFragment();
         Bundle args = new Bundle();
         return fragment;
     }
@@ -38,36 +41,38 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        rootView = inflater.inflate(R.layout.fragment_testing, container, false);
 
-        newPollButton = (Button) rootView.findViewById(R.id.newPoll_button);
-        testButton = (Button) rootView.findViewById(R.id.homescree_test_button);
+        defaultTestButton = (Button) rootView.findViewById(R.id.default_test_button);
+        loadSequenceButton = (Button) rootView.findViewById(R.id.load_sequence_button);
+        createSequencebutton = (Button) rootView.findViewById(R.id.make_sequence_button);
 
-        newPollButton.setOnClickListener(new View.OnClickListener() {
+        defaultTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: start voting fragment
-                Fragment voting = new StartVoteFragment();
+                //TODO: run default sequence
+            }
+        });
+
+        loadSequenceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: load a premade test sequence
+            }
+        });
+
+        createSequencebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment newTest = new MakeTestFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frag_container, voting)
-                        .addToBackStack("home")
+                        .replace(R.id.main_frag_container, newTest)
                         .commit();
             }
         });
 
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO: start testing fragment
-                Fragment testing = new TestingFragment();
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frag_container, testing)
-                        .addToBackStack("home")
-                        .commit();
-            }
-        });
 
-        //for back press
+        //for back pressed
         rootView.setFocusableInTouchMode(true);
         rootView.requestFocus();
         rootView.setOnKeyListener(new View.OnKeyListener() {
@@ -82,7 +87,6 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
-
 
         return rootView;
     }
@@ -103,7 +107,9 @@ public class HomeFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }*/
+
     }
+
 
     @Override
     public void onDetach() {

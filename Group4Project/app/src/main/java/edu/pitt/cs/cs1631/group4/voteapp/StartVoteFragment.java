@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +77,7 @@ public class StartVoteFragment extends Fragment {
                 int idInt = Integer.parseInt(id);
                 //add to map
                 contestants.add(name);
-                contestants.add(id.toString());;
+                contestants.add(id);
                 //add to display
                 String toList = name + "\t\t:\t\t" + id;
                 entries.add(toList);
@@ -100,9 +102,40 @@ public class StartVoteFragment extends Fragment {
                 //this may have to change for using fragments instead
                 //fragments are better because mainactivity stays active.
 
-                Intent startVote = new Intent(getContext(), ResultsActivity.class);
-                startVote.putStringArrayListExtra("theList", contestants);
-                startActivity(startVote);
+
+
+                //TODO: !!!!!!!!!!
+                //need to get the list to the next fragment instead.
+                //maybe put extra in fragments?????
+
+
+                //Intent startVote = new Intent(getContext(), ResultsActivity.class);
+                //startVote.putStringArrayListExtra("theList", contestants);
+                //startActivity(startVote);
+
+                //this starts the voting
+                //note this does not send a list to the fragment
+                Fragment results = new ResultsFragment();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_frag_container, results)
+                        .addToBackStack("newPoll")
+                        .commit();
+            }
+        });
+
+        //for back press
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
+        rootView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                //Log.i(tag, "keyCode: " + keyCode);
+                if( keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+                    //Log.i(tag, "onKey Back listener is working!!!");
+                    getFragmentManager().popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    return true;
+                }
+                return false;
             }
         });
 

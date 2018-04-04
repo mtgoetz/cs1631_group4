@@ -63,6 +63,10 @@ public class ResultsActivity extends AppCompatActivity {
         list = new ArrayList<>();
         displayResults = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
         resultsView.setAdapter(displayResults);
+
+
+
+        //this starts the background tasks
         service = new VotingService();
         receiver = new VoteReceiver(service);
         IntentFilter filter = new IntentFilter();
