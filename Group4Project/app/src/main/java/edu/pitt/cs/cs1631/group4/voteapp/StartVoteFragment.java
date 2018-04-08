@@ -33,6 +33,10 @@ public class StartVoteFragment extends Fragment {
 
     //private OnFragmentInteractionListener mListener;
 
+    public interface VotingContestant {
+        public void setContestantsList(ArrayList<String> contestantsList);
+    }
+
     public StartVoteFragment() {
         // Required empty public constructor
     }
@@ -82,6 +86,8 @@ public class StartVoteFragment extends Fragment {
                 String toList = name + "\t\t:\t\t" + id;
                 entries.add(toList);
                 entries.notifyDataSetChanged();
+                nameInput.setText("");
+                idInput.setText("");
             }
         });
 
@@ -98,23 +104,16 @@ public class StartVoteFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                //TODO:
-                //this may have to change for using fragments instead
-                //fragments are better because mainactivity stays active.
-
-
-
-                //TODO: !!!!!!!!!!
-                //need to get the list to the next fragment instead.
-                //maybe put extra in fragments?????
-
-
-                //Intent startVote = new Intent(getContext(), ResultsActivity.class);
-                //startVote.putStringArrayListExtra("theList", contestants);
-                //startActivity(startVote);
-
                 //this starts the voting
-                //note this does not send a list to the fragment
+                //Note: list is sent to mainactivity through interface and then to
+                //resultsFragment through another interface.
+                try {
+                    VotingContestant main = (VotingContestant)getActivity();
+                    main.setContestantsList(contestants);
+                } catch (ClassCastException c) {
+                    throw new ClassCastException(getActivity().toString()
+                            + " must implement VotingContestant");
+                }
                 Fragment results = new ResultsFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.main_frag_container, results)

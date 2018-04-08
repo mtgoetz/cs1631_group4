@@ -31,11 +31,12 @@ import java.util.ArrayList;
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ClientInfo;
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ServerService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements StartVoteFragment.VotingContestant, ResultsFragment.TransferList {
 
 
     TextView statusText;
     TextView iptext;
+    ArrayList<String> contestantList;
 
 
     private ServerService serverService;
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -282,5 +284,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         stopService();
         super.onDestroy();
+    }
+
+    @Override
+    public void setContestantsList(ArrayList<String> contestantsList) {
+        this.contestantList = contestantsList;
+    }
+
+    @Override
+    public ArrayList<String> getContestantsList() {
+        return this.contestantList;
     }
 }

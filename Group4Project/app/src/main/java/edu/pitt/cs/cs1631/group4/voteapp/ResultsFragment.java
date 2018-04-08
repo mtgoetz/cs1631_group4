@@ -1,10 +1,13 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +26,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class ResultsFragment extends Fragment {
@@ -36,9 +41,21 @@ public class ResultsFragment extends Fragment {
     ArrayList<String> list;
     VotingService service;
     VoteReceiver receiver;
+    ArrayList<String> stringContestantList;
+
+
     final int RESULT_SUCCESS = 0;
     final int RESULT_INVALID = 1;
     final int RESULT_DUPLICATE = 2;
+
+
+
+
+
+    public interface TransferList {
+        public ArrayList<String> getContestantsList();
+    }
+
 
     //private OnFragmentInteractionListener mListener;
 
@@ -100,11 +117,41 @@ public class ResultsFragment extends Fragment {
         //ArrayList<String> l = getActivity().getIntent().getStringArrayListExtra("theList");
         //Iterator<String> items = l.iterator();
 
-
+        try {
+            TransferList listProvider = (TransferList) getActivity();
+            stringContestantList = listProvider.getContestantsList();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement TransferList");
+        }
 
         ///Temp to compile
-        ArrayList<String> l = new ArrayList<>();
-        Iterator<String> items = l.iterator();
+        //ArrayList<String> l = new ArrayList<>();
+
+        if(stringContestantList == null)Toast.makeText(getContext(), "list did not transfer", Toast.LENGTH_LONG);
+
+        /////////!!!!!!!!!This did not work
+        Iterator<String> items;
+        if(stringContestantList != null)  items = stringContestantList.iterator();
+        else {
+
+            Toast.makeText(getContext(), "list did not transfer", Toast.LENGTH_LONG);
+
+            //return empty iterator for now.
+            //TODO: do better
+            stringContestantList = new ArrayList<String>();
+            items = new Iterator<String>() {
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
+
+                @Override
+                public String next() {
+                    return null;
+                }
+            };
+        }
 
         try {
             while (items.hasNext()) {
@@ -115,6 +162,13 @@ public class ResultsFragment extends Fragment {
         } catch (Exception e) {
             Log.e("error", "Error getting contestants");
         }
+
+
+
+
+
+
+
 
         previewButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,4 +258,7 @@ public class ResultsFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }*/
+
+
+
 }
