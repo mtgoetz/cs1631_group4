@@ -1,7 +1,6 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
 import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
 import android.arch.persistence.room.Room;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,19 +16,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +34,6 @@ import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ServerService;
 
 public class MainActivity extends AppCompatActivity implements StartVoteFragment.VotingContestant, ResultsFragment.TransferList, TestingFragment.TestingCom, MakeTestFragment.MakeTestCom{
 
-
     TextView statusText;
     TextView iptext;
     ArrayList<String> contestantList;
@@ -51,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
     TestDatabase db;
     ArrayList<ArrayList<TestVote>> savedTables;
     DatabaseAsync dbAsync;
-
 
     private ServerService serverService;
     /**
@@ -141,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
 
     private ServiceConnection mConnection = null;
 
-
 /*    public interface Status {
         //1 = connected
         //2 = disconnected
@@ -176,11 +165,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         }
     }
 
-
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -200,10 +184,8 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         iptext = (TextView)findViewById(R.id.main_port_text);
         statusText = (TextView) findViewById(R.id.main_status_text);
 
-
         db = (TestDatabase)Room.databaseBuilder(getApplicationContext(), TestDatabase.class, "testingDB")
                 .build();
-        //db = (TestDatabase)Room.databaseBuilder(getApplicationContext(), TestDatabase.class, "testingDB").build();
         dbAsync = new DatabaseAsync();
         dbAsync.execute();
 
@@ -211,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
 
 /*        SupportSQLiteOpenHelper helper = db.getOpenHelper();
         SupportSQLiteDatabase database = helper.getWritableDatabase();*/
-
 
         Fragment home = new HomeFragment();
         getSupportFragmentManager().beginTransaction()
@@ -241,10 +222,7 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         uniqueID = UUID.randomUUID().toString();
         aVote = new TestVote(uniqueID, 0, 5, 1, 5);
         td.insertTestVote(aVote);
-
-
     }
-
 
     @Override
     public void onStart() {
@@ -266,10 +244,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
-
-
-
-
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -380,7 +354,8 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
     }
 
     @Override
-    public void saveSeq(List<TestVote> votes) {
+    public void saveSeq(final List<TestVote> votes) {
+
         dbAsync = new DatabaseAsync();
         dbAsync.saveSeq(votes);
         dbAsync.execute();
@@ -403,8 +378,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            //Perform pre-adding operation here.
         }
 
         public void saveSeq(List<TestVote> testVotes) {
@@ -426,8 +399,8 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
                     td.insertTestVote(vote);
                 }
                 save = false;
+                return null;
             }
-
 
             List<TestVote> test;
 
@@ -438,7 +411,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
                 try {
                     test = new ArrayList<TestVote>(td.getSaved(i));
                     if(test.size() == 0){
-                        //if(i == 1)makeDefault(td);
                         break;
                     }
                     savedTables.add((ArrayList<TestVote>)test);
@@ -450,20 +422,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
                     break;
                 }
             }
-
-
-            //Let's add some dummy data to the database.
-            //University university = new University();
-            //university.setName("MyUniversity");
-
-            //College college = new College();
-            //college.setId(1);
-            //college.setName("MyCollege");
-
-            //university.setCollege(college);
-
-            //Now access all the methods defined in DaoAccess with sampleDatabase object
-            //sampleDatabase.daoAccess().insertOnlySingleRecord(university);
 
             return null;
         }

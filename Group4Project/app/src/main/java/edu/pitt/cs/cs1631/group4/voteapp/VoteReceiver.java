@@ -13,25 +13,17 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.xml.transform.Result;
 
 public class VoteReceiver extends BroadcastReceiver {
     final int RESULT_SUCCESS = 0;
     final int RESULT_INVALID = 1;
     private boolean testResult = true;
-    //final int TEST_SUCCESSFUL = 3;
 
     //for casting test votes.
     private boolean test = false;
-    //private int testCount = 0;
 
     public static final String TAG = "Uploader";
 
@@ -48,8 +40,6 @@ public class VoteReceiver extends BroadcastReceiver {
     public static final int DISCONNECTED = 2;
     public static final int MESSAGE_RECEIVED = 3;
 
-
-    //TODO: delete when done
     private VotingService service;
 
     static Handler callbacks = new Handler(){
@@ -88,10 +78,8 @@ public class VoteReceiver extends BroadcastReceiver {
     public VoteReceiver(VotingService service)
     {
         super();
-        //TODO: delete when done
+
         this.service = service;
-
-
 
         //register
         client = new ComponentSocket(NetTool.getIpAddress(), 8000,callbacks);
@@ -114,25 +102,15 @@ public class VoteReceiver extends BroadcastReceiver {
                 client.setMessage(list);
             }
         }, 100);
-
-
-
     }
 
+    //Not used
     public void sendTestMessage() {
 
         KeyValueList testMessage = generateVoteMessage("555", "1");
 
         client.setMessage(testMessage);
     }
-
-/*    public int simulateOnReceive(Long fromNumber, int selection)
-    {
-        //use for testing...
-        //TODO
-        return service.castVote(fromNumber, selection);
-
-    }*/
 
     public boolean getTestResult() {
         return testResult;
@@ -148,11 +126,9 @@ public class VoteReceiver extends BroadcastReceiver {
         //Toast.makeText(getApplicationContext(), "sms received", Toast.LENGTH_LONG).show();
         //TODO:
         if(!service.isListening()) return;
-        //goAsync();
         Bundle bundle = intent.getExtras();
         SmsMessage[] msg;
         long phoneNumber;
-        //int selection;
         int selection;
 
         Log.d("sms received", "Intent recieved: " + intent.getAction());
@@ -166,18 +142,8 @@ public class VoteReceiver extends BroadcastReceiver {
                     String userphoneNumber = (msg[i].getOriginatingAddress());
 
                     selection = Integer.parseInt(msg[i].getDisplayMessageBody());
-                    //selection = msg[i].getDisplayMessageBody().toString();
 
-                    //boolean testVar = false;
-                    //TODO
-                    //if(test) testVar = service.castTestVote(phoneNumber, selection, )
-/*                    if(test) {
-                        boolean result = service.castTestVote(phoneNumber, selection);
-                        if(test) testResult = result;
-                        return;
-                    }*/
                     int result = service.castVote(phoneNumber, selection);
-
 
 /*                    KeyValueList vote = generateVoteMessage(userphoneNumber, selection);
                     client.setMessage(vote);*/

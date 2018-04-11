@@ -1,8 +1,6 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,12 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
 import java.util.ArrayList;
 
-
 public class StartVoteFragment extends Fragment {
-
 
     EditText nameInput;
     EditText idInput;
@@ -30,8 +25,6 @@ public class StartVoteFragment extends Fragment {
     Button clearButton;
     Button startButton;
     ArrayList<String> contestants;
-
-    //private OnFragmentInteractionListener mListener;
 
     public interface VotingContestant {
         public void setContestantsList(ArrayList<String> contestantsList);
@@ -59,7 +52,6 @@ public class StartVoteFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_start_vote, container, false);
 
-
         nameInput = (EditText)rootView.findViewById(R.id.textName);
         idInput = (EditText)rootView.findViewById(R.id.enterID);
         addButton = (Button) rootView.findViewById(R.id.addButton);
@@ -79,14 +71,16 @@ public class StartVoteFragment extends Fragment {
                 //else add to list and display
                 String name = nameInput.getText().toString();
                 String id = idInput.getText().toString();
-                int idInt = Integer.parseInt(id);
+                //int idInt = Integer.parseInt(id);
                 //add to map
                 contestants.add(name);
                 contestants.add(id);
                 //add to display
                 String toList = name + "\t\t:\t\t" + id;
                 entries.add(toList);
+                //update display
                 entries.notifyDataSetChanged();
+                //clear fields
                 nameInput.setText("");
                 idInput.setText("");
             }
@@ -95,6 +89,7 @@ public class StartVoteFragment extends Fragment {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //clear list
                 list = new ArrayList<String>();
                 entries.clear();
                 entries.notifyDataSetChanged();
@@ -143,22 +138,9 @@ public class StartVoteFragment extends Fragment {
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-/*    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-/*        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
 
     @Override
@@ -166,19 +148,4 @@ public class StartVoteFragment extends Fragment {
         super.onDetach();
         //mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-/*    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }*/
 }

@@ -25,13 +25,6 @@
                 <category android:name="android.intent.category.NORMAL" />
             </intent-filter>
         </activity>
-        <activity android:name=".ResultsActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="andoid.intent.catagory.NORMAL" />
-            </intent-filter>
-        </activity>
         <activity android:name=".SignInActivity"
             android:label="@string/title_activity_sign_in">
             <intent-filter>

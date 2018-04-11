@@ -142,10 +142,7 @@ public class VotingService extends Application {
                     client.setMessage(list);
                 }
             }, 100);
-
         }
-
-
     }
 
     public boolean isListening(){
@@ -168,9 +165,6 @@ public class VotingService extends Application {
     * @return true if the expected result is equal to the actual returned vale.
     * */
     public boolean castTestVote(Long userPhoneNum, int contestantID, int expectedResultCode) {
-        //int expectedResultCode = 0;
-
-        //userPhoneNum += count++;
         int result = castVote(userPhoneNum, contestantID);
         if(result != expectedResultCode) return false;
         return true;
@@ -253,34 +247,12 @@ public class VotingService extends Application {
         list.putPair("Direction", "Up");
         list.putPair("Receiver", "Uploader");
 
-        //list.putPair("Data_BP", "unavailable");
-
-/*        if(data.contains("EMG:") && data.contains("ECG:")){
-            int index = data.indexOf("EMG:");
-            int ecgindex = data.indexOf("ECG:");
-            int vindex = data.indexOf("V");
-            System.out.println("index:"+index);
-            System.out.println("ecgindex:"+ecgindex);
-            String emg = data.substring(index+4, ecgindex);
-            String ecg = data.substring(ecgindex+4, vindex);
-            System.out.println("emg:"+emg);
-            System.out.println("ecg:"+ecg);
-
-            list.putPair("Data_EMG", emg);
-            list.putPair("Data_ECG", ecg);
-        }*/
-
-        //list.putPair("Data_Pulse", "unavailable");
-
-        //long curr_time = System.currentTimeMillis();
-        //list.putPair("Data_Date", String.valueOf(curr_time));
         return list;
     }
 
     public void sendResult(int result) {
         //TODO: send the result code and give it to the receiver.
     }
-
 
     //give this the current IP and port
 /*    public void sendConnect(String IP){

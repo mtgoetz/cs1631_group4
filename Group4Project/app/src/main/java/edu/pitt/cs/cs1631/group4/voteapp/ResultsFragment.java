@@ -1,13 +1,9 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,13 +18,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
 
 public class ResultsFragment extends Fragment {
 
@@ -36,7 +28,6 @@ public class ResultsFragment extends Fragment {
     Button previewButton;
     Button stopButton;
     TextView top;
-    //TallyTable table;
     ArrayAdapter<String> displayResults;
     ArrayList<String> list;
     VotingService service;
@@ -44,23 +35,15 @@ public class ResultsFragment extends Fragment {
     ArrayList<String> stringContestantList;
     boolean testMode = false;
 
-
     final int RESULT_SUCCESS = 0;
     final int RESULT_INVALID = 1;
     final int RESULT_DUPLICATE = 2;
-
-
-
-
 
     public interface TransferList {
         public ArrayList<String> getContestantsList();
         public boolean forTesting();
         public ArrayList<TestVote> getTestTable();
     }
-
-
-    //private OnFragmentInteractionListener mListener;
 
     public ResultsFragment() {
         // Required empty public constructor
@@ -76,7 +59,6 @@ public class ResultsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         //Double check permissions
         if(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.RECEIVE_SMS) != 0)
         {
@@ -89,9 +71,6 @@ public class ResultsFragment extends Fragment {
             Toast.makeText(getContext(), "No permission", Toast.LENGTH_SHORT).show();
 
         }
-
-
-
     }
 
     @Override
@@ -117,9 +96,6 @@ public class ResultsFragment extends Fragment {
 
         service.toggleListening();
 
-        //ArrayList<String> l = getActivity().getIntent().getStringArrayListExtra("theList");
-        //Iterator<String> items = l.iterator();
-
         final TransferList listProvider;
         try {
             listProvider = (TransferList) getActivity();
@@ -132,20 +108,15 @@ public class ResultsFragment extends Fragment {
 
         if(testMode) receiver.toggleTesting();
 
-        ///Temp to compile
-        //ArrayList<String> l = new ArrayList<>();
-
         if(stringContestantList == null)Toast.makeText(getContext(), "list did not transfer", Toast.LENGTH_LONG);
 
-        /////////!!!!!!!!!This did not work
         Iterator<String> items;
         if(stringContestantList != null)  items = stringContestantList.iterator();
         else {
 
             Toast.makeText(getContext(), "list did not transfer", Toast.LENGTH_LONG);
 
-            //return empty iterator for now.
-            //TODO: do better
+            //return empty iterator.
             stringContestantList = new ArrayList<String>();
             items = new Iterator<String>() {
                 @Override
@@ -170,13 +141,6 @@ public class ResultsFragment extends Fragment {
             Log.e("error", "Error getting contestants");
         }
 
-
-
-
-
-
-
-
         previewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,7 +154,6 @@ public class ResultsFragment extends Fragment {
                     String displ = entry.getKey().getName();
                     displ += "\t\t:\t\t" + entry.getValue();
                     displayResults.add(displ);
-
                 }
                 displayResults.notifyDataSetChanged();
             }
@@ -240,13 +203,6 @@ public class ResultsFragment extends Fragment {
             }
         });
 
-/*        if(testMode) {
-            //run tests here
-            boolean result = runTest(listProvider.getTestTable());
-            if(result) Toast.makeText(getContext(), "test passed", Toast.LENGTH_LONG).show();
-            else Toast.makeText(getContext(), "test failed", Toast.LENGTH_LONG).show();
-        }*/
-
         return rootView;
     }
 
@@ -258,20 +214,17 @@ public class ResultsFragment extends Fragment {
             Long phone = p.longValue();
             int selection = vote.getSelection();
             int exp = vote.getExpected();
-            //send sms
 
-            //TODO: !!!!cast votes and compare results here.
+            //Cast test vote
             boolean result = service.castTestVote((Long)phone, selection, exp);
+
             //get result code and compare to selection
-
-
             //if(!receiver.getTestResult()) {
             if(!result){
                 Toast.makeText(getContext(), "Test Failed!", Toast.LENGTH_LONG).show();
                 return false;
             }
         }
-
 
         Toast.makeText(getContext(), "Test Passed", Toast.LENGTH_LONG).show();
         return true;
@@ -281,35 +234,10 @@ public class ResultsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-/*        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        //mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-/*    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }*/
-
-
-
 }
