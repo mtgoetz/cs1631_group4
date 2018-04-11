@@ -33,6 +33,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ClientInfo;
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ServerService;
@@ -199,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
 
 
         db = (TestDatabase)Room.databaseBuilder(getApplicationContext(), TestDatabase.class, "testingDB")
-                .fallbackToDestructiveMigration()
                 .build();
         //db = (TestDatabase)Room.databaseBuilder(getApplicationContext(), TestDatabase.class, "testingDB").build();
         dbAsync = new DatabaseAsync();
@@ -382,6 +384,15 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         dbAsync = new DatabaseAsync();
         dbAsync.saveSeq(votes);
         dbAsync.execute();
+        try {
+            dbAsync.get(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
     }
 
     private class DatabaseAsync extends AsyncTask<Void, Void, Void> {

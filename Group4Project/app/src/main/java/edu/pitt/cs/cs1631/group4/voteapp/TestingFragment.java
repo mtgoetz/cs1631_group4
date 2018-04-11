@@ -97,7 +97,7 @@ public class TestingFragment extends Fragment {
                 //testTable = (ArrayList<TestVote>) defaultSeq;
                 //tc.setTestTable(testTable); - in runTest()
 
-
+                //receiver.toggleTesting();
                 runTest(0);
             }
         });
@@ -116,6 +116,7 @@ public class TestingFragment extends Fragment {
                 //String savedSeq = sharedPref.getString("savedSequence", null);
 
                 //Toast.makeText(getContext(), savedSeq, Toast.LENGTH_LONG);
+                //receiver.toggleTesting();
                 runTest(1);
 
             }
@@ -142,6 +143,7 @@ public class TestingFragment extends Fragment {
                 //Log.i(tag, "keyCode: " + keyCode);
                 if( keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     //Log.i(tag, "onKey Back listener is working!!!");
+                    //receiver.toggleTesting();
                     getFragmentManager().popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     return true;
                 }
@@ -175,7 +177,7 @@ public class TestingFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        receiver.toggleTesting();
+
         //mListener = null;
     }
 

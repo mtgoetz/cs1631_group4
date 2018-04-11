@@ -104,10 +104,11 @@ public class MakeTestFragment extends Fragment {
             public void onClick(View v) {
                 //TODO: add random vote to seq and listview
                 if(list.size() == 0) return;
-                //String dup = list.get(0);
-                //int selection = Integer.parseInt(dup.substring(dup.lastIndexOf(dup)));
+                String dup = list.get(0);
+                int selection = Integer.parseInt(dup.substring(9));
                 String uniqueID = UUID.randomUUID().toString();
-                TestVote duplicate = new TestVote(uniqueID, nextTestNum, 1, 2, phoneNum);
+                TestVote duplicate = new TestVote(uniqueID, nextTestNum, selection, 2, --phoneNum);
+                phoneNum++;
                 testVotes.add(duplicate);
 
                 String disp = "Duplicate Vote";
@@ -134,54 +135,6 @@ public class MakeTestFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-
-
-
-                //TODO: save sequence to phone - will run at load
-
-/*                String filename = "savedSequence";
-
-                //TODO: this will be what is saved
-                String fileContents = "Sample saved file";
-
-                FileOutputStream outputStream;
-
-                try {
-                    outputStream = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
-                    outputStream.write(fileContents.getBytes());
-                    outputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
-
-                //this will do to save one sequence
-                //String fileContents = "Sample saved file";
-
-
-
-
-                //IDK if this will work
-/*                View item;
-
-                String s = "";
-                EditText e;
-                for(int i = 0; i < listView.getCount(); i++) {
-                    item = listView.getChildAt(i);
-                    s += item.toString();
-                    s += ";";
-                }*/
-
-
-
-
-/*                SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("savedSequence", fileContents);
-                editor.commit();*/
-
-                //getActivity().onBackPressed();
 
 
                 mtc.saveSeq(testVotes);
