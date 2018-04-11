@@ -1,6 +1,7 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
 import android.app.PendingIntent;
+import android.arch.persistence.db.SupportSQLiteOpenHelper;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Delete;
@@ -9,6 +10,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +30,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.wallet.fragment.WalletFragmentStyle;
 
+import junit.framework.Test;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -43,6 +48,12 @@ public class TestingFragment extends Fragment {
     Button createSequencebutton;
     VoteReceiver receiver;
     VotingService service;
+    private ArrayList<TestVote> testTable;
+
+    public interface TestingCom {
+        public void setTestTable(int i);
+        public TestingDao getDB();
+    }
 
     private View rootView;
 
@@ -67,10 +78,9 @@ public class TestingFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_testing, container, false);
 
-        service = new VotingService();
-        receiver = new VoteReceiver(service);
-        receiver.toggleTesting();
-
+        //service = new VotingService();
+        //receiver = new VoteReceiver(service);
+        //receiver.toggleTesting();
 
         defaultTestButton = (Button) rootView.findViewById(R.id.default_test_button);
         loadSequenceButton = (Button) rootView.findViewById(R.id.load_sequence_button);
@@ -80,6 +90,15 @@ public class TestingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //TODO: run default sequence
+                //get the default sequence
+                //TestingCom tc = (TestingCom)getActivity();
+                //List<TestVote> defaultSeq = tc.getDB().getSaved(1);
+                //set it to the testTable data member.
+                //testTable = (ArrayList<TestVote>) defaultSeq;
+                //tc.setTestTable(testTable); - in runTest()
+
+
+                runTest(0);
             }
         });
 
@@ -93,11 +112,11 @@ public class TestingFragment extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }*/
-                SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", MODE_PRIVATE);
-                String savedSeq = sharedPref.getString("savedSequence", null);
+                //SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", MODE_PRIVATE);
+                //String savedSeq = sharedPref.getString("savedSequence", null);
 
-                Toast.makeText(getContext(), savedSeq, Toast.LENGTH_LONG);
-
+                //Toast.makeText(getContext(), savedSeq, Toast.LENGTH_LONG);
+                runTest(1);
 
             }
         });
@@ -123,7 +142,7 @@ public class TestingFragment extends Fragment {
                 //Log.i(tag, "keyCode: " + keyCode);
                 if( keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
                     //Log.i(tag, "onKey Back listener is working!!!");
-                    getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    getFragmentManager().popBackStack("home", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     return true;
                 }
                 return false;
@@ -161,74 +180,48 @@ public class TestingFragment extends Fragment {
     }
 
 
-    public void runDefaultTest() {
+    public void runTest(int i) {
 
         //receiver = new VoteReceiver(new VotingService());
 
         //code a sequence...how to start and stop????
 
 
+        //need to start a resultsFrag with a contestant table, a testVote table and testMode = true;
 
+        try{
+        //set the testing table that should be loaded elsewhere
+        TestingCom tc = (TestingCom)getActivity();
+        tc.setTestTable(i);
 
-    }
+        StartVoteFragment.VotingContestant vc = (StartVoteFragment.VotingContestant)getActivity();
+        ArrayList<String> testContestants = new ArrayList<>();
+        testContestants.add("C1");
+        testContestants.add("0");
+        testContestants.add("C2");
+        testContestants.add("1");
+        testContestants.add("C3");
+        testContestants.add("2");
+        testContestants.add("C4");
+        testContestants.add("3");
 
-    public boolean sendTextMessage(Long phoneNumber, int selection, int expectedResultCode) {
+        vc.setContestantsList(testContestants);
+        vc.setTesting(true);
 
+        //not start the results fragment and it should run the test. (I hope)
 
-        String message = Integer.toString(selection);
-        SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage(phoneNumber.toString(), null, message, null, null);
-        //TODO: !!!!!!!!!this must be insantiated at some point
-        int result = receiver.getTestResult();
-
-        if(result != expectedResultCode) return false;
-        return true;
-
-        //do something with the result.
-        //0 = success
-        //1 = invalid choice
-        //2 = double vote.
-
-
-
-/*        String message;
-        if(result == 0)
-        {
-            message = "vote recorded";
+        } catch (ClassCastException c) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement VotingContestant");
         }
-        else if(result == 1)
-        {
-            message = "choice invalid, please try again.";
-        }
-        else
-        {
-            message = "only one vote allowed per user.";
-        }*/
-/*        if(ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != 0)
-        {
-            int x = 1;
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.SEND_SMS}, x);
-        }*/
-        //SmsManager sms = SmsManager.getDefault();
-        //sms.sendTextMessage(userphoneNumber, null, message, null, null);
-        //Toast.makeText(getContext(), "Sent to: " + phoneNumber + " : " + message, Toast.LENGTH_LONG).show();
+        Fragment results = new ResultsFragment();
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_frag_container, results)
+                .addToBackStack("test")
+                .commit();
 
-    }
 
-    @Dao
-    public interface TestingDao {
 
-        @Insert(onConflict = OnConflictStrategy.REPLACE)
-        public void insertTestVote(TestVote aVote);
-
-        @Delete
-        public void deleteTestVote(TestVote aVote);
-
-        @Query("SELECT * FROM testvote")
-        List<TestVote> getAll();
-
-        @Query("SELECT * FROM testvote WHERE test_num = :testNum")
-        List<TestVote> getSaved(int testNum);
     }
 
     /**

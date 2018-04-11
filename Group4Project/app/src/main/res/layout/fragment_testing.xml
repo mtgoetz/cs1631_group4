@@ -23,7 +23,7 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/load_sequence_button"
         android:layout_below="@id/guide_view"
-        android:text="Load a Sequence"/>
+        android:text="Run Saved Sequence"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

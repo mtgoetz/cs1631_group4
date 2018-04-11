@@ -26,9 +26,12 @@ import javax.xml.transform.Result;
 public class VoteReceiver extends BroadcastReceiver {
     final int RESULT_SUCCESS = 0;
     final int RESULT_INVALID = 1;
-    private boolean test = false;
-    private int testResult = 3;
+    private boolean testResult = true;
     //final int TEST_SUCCESSFUL = 3;
+
+    //for casting test votes.
+    private boolean test = false;
+    //private int testCount = 0;
 
     public static final String TAG = "Uploader";
 
@@ -131,7 +134,7 @@ public class VoteReceiver extends BroadcastReceiver {
 
     }*/
 
-    public int getTestResult() {
+    public boolean getTestResult() {
         return testResult;
     }
 
@@ -168,8 +171,13 @@ public class VoteReceiver extends BroadcastReceiver {
                     //boolean testVar = false;
                     //TODO
                     //if(test) testVar = service.castTestVote(phoneNumber, selection, )
+/*                    if(test) {
+                        boolean result = service.castTestVote(phoneNumber, selection);
+                        if(test) testResult = result;
+                        return;
+                    }*/
                     int result = service.castVote(phoneNumber, selection);
-                    if(test) testResult = result;
+
 
 /*                    KeyValueList vote = generateVoteMessage(userphoneNumber, selection);
                     client.setMessage(vote);*/

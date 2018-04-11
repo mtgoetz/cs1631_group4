@@ -35,6 +35,7 @@ public class StartVoteFragment extends Fragment {
 
     public interface VotingContestant {
         public void setContestantsList(ArrayList<String> contestantsList);
+        public void setTesting(boolean testing);
     }
 
     public StartVoteFragment() {
@@ -110,6 +111,7 @@ public class StartVoteFragment extends Fragment {
                 try {
                     VotingContestant main = (VotingContestant)getActivity();
                     main.setContestantsList(contestants);
+                    main.setTesting(false);
                 } catch (ClassCastException c) {
                     throw new ClassCastException(getActivity().toString()
                             + " must implement VotingContestant");

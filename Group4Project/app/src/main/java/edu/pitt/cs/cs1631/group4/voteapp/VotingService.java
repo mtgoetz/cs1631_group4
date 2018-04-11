@@ -168,7 +168,9 @@ public class VotingService extends Application {
     * @return true if the expected result is equal to the actual returned vale.
     * */
     public boolean castTestVote(Long userPhoneNum, int contestantID, int expectedResultCode) {
-        userPhoneNum += count++;
+        //int expectedResultCode = 0;
+
+        //userPhoneNum += count++;
         int result = castVote(userPhoneNum, contestantID);
         if(result != expectedResultCode) return false;
         return true;

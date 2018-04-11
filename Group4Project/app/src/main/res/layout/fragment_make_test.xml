@@ -17,19 +17,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/add_start_button"
-            android:text="start"
+            android:text="valid"
             />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/add_vote_button"
-            android:text="random vote"
+            android:text="duplicate"
             />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/add_stop_button"
-            android:text="stop"
+            android:text="invalid"
             />
     </LinearLayout>
     <TextView

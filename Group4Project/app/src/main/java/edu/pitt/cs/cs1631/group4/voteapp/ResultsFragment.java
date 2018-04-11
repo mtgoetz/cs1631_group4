@@ -42,6 +42,7 @@ public class ResultsFragment extends Fragment {
     VotingService service;
     VoteReceiver receiver;
     ArrayList<String> stringContestantList;
+    boolean testMode = false;
 
 
     final int RESULT_SUCCESS = 0;
@@ -54,6 +55,8 @@ public class ResultsFragment extends Fragment {
 
     public interface TransferList {
         public ArrayList<String> getContestantsList();
+        public boolean forTesting();
+        public ArrayList<TestVote> getTestTable();
     }
 
 
@@ -117,13 +120,17 @@ public class ResultsFragment extends Fragment {
         //ArrayList<String> l = getActivity().getIntent().getStringArrayListExtra("theList");
         //Iterator<String> items = l.iterator();
 
+        final TransferList listProvider;
         try {
-            TransferList listProvider = (TransferList) getActivity();
+            listProvider = (TransferList) getActivity();
             stringContestantList = listProvider.getContestantsList();
+            testMode = listProvider.forTesting();
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString()
                     + " must implement TransferList");
         }
+
+        if(testMode) receiver.toggleTesting();
 
         ///Temp to compile
         //ArrayList<String> l = new ArrayList<>();
@@ -192,6 +199,14 @@ public class ResultsFragment extends Fragment {
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(testMode) {
+                    //run tests here
+                    boolean result = runTest(listProvider.getTestTable());
+                    if(result) Toast.makeText(getContext(), "test passed", Toast.LENGTH_LONG).show();
+                    else Toast.makeText(getContext(), "test failed", Toast.LENGTH_LONG).show();
+                }
+
                 service.toggleListening();
                 displayResults.clear();
                 top.setText("Final Results:");
@@ -205,6 +220,7 @@ public class ResultsFragment extends Fragment {
 
                 }
                 displayResults.notifyDataSetChanged();
+                if(testMode) receiver.toggleTesting();
             }
         });
 
@@ -219,11 +235,46 @@ public class ResultsFragment extends Fragment {
                     getFragmentManager().popBackStack("newPoll", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     return true;
                 }
+                getActivity().onBackPressed();
                 return false;
             }
         });
 
+/*        if(testMode) {
+            //run tests here
+            boolean result = runTest(listProvider.getTestTable());
+            if(result) Toast.makeText(getContext(), "test passed", Toast.LENGTH_LONG).show();
+            else Toast.makeText(getContext(), "test failed", Toast.LENGTH_LONG).show();
+        }*/
+
         return rootView;
+    }
+
+    public boolean runTest(ArrayList<TestVote> testTable) {
+
+        for(TestVote vote: testTable) {
+            //send the tests
+            Integer p = vote.getPhoneNum();
+            Long phone = p.longValue();
+            int selection = vote.getSelection();
+            int exp = vote.getExpected();
+            //send sms
+
+            //TODO: !!!!cast votes and compare results here.
+            boolean result = service.castTestVote((Long)phone, selection, exp);
+            //get result code and compare to selection
+
+
+            //if(!receiver.getTestResult()) {
+            if(!result){
+                Toast.makeText(getContext(), "Test Failed!", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }
+
+
+        Toast.makeText(getContext(), "Test Passed", Toast.LENGTH_LONG).show();
+        return true;
     }
 
 

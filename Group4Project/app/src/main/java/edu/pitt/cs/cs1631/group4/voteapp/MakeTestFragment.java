@@ -1,9 +1,6 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
-import android.app.LauncherActivity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,23 +8,35 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import java.io.FileOutputStream;
 
-import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class MakeTestFragment extends Fragment {
 
     //private OnFragmentInteractionListener mListener;
 
-    Button addStart;
-    Button addVote;
-    Button addStop;
+    Button addValid;
+    Button addDup;
+    Button addInvalid;
     ListView listView;
     Button saveButton;
     Button cancelButton;
+    ArrayList<TestVote> testVotes;
+    private int nextTestNum = 1;
+    private int phoneNum = 0;
+    ArrayList<String> list;
+    ArrayAdapter<String> adapter;
+
+    public interface MakeTestCom{
+        int getNextTestCode();
+        void saveSeq(List<TestVote> votes);
+    }
 
     public MakeTestFragment() {
         // Required empty public constructor
@@ -39,6 +48,10 @@ public class MakeTestFragment extends Fragment {
         return fragment;
     }
 
+/*    public int rnd(){
+        return Random.nextInt(4);
+    }*/
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,41 +59,86 @@ public class MakeTestFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_make_test, container, false);
 
-        addStart = (Button) rootView.findViewById(R.id.add_start_button);
-        addVote = (Button) rootView.findViewById(R.id.add_vote_button);
-        addStop = (Button) rootView.findViewById(R.id.add_stop_button);
+        addValid = (Button) rootView.findViewById(R.id.add_start_button);
+        addDup = (Button) rootView.findViewById(R.id.add_vote_button);
+        addInvalid = (Button) rootView.findViewById(R.id.add_stop_button);
         listView = (ListView) rootView.findViewById(R.id.make_list);
         saveButton = (Button) rootView.findViewById(R.id.make_save_button);
         cancelButton = (Button) rootView.findViewById(R.id.make_cancel_button);
 
-        addStart.setOnClickListener(new View.OnClickListener() {
+
+        list = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, list);
+        listView.setAdapter(adapter);
+
+        final MakeTestCom mtc = (MakeTestCom)getActivity();
+        //nextTestNum = mtc.getNextTestCode();
+
+        testVotes = new ArrayList<>();
+
+        addValid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: add start event to sequence and listview
+                String uniqueID = UUID.randomUUID().toString();
+
+                Random rd = new Random();
+
+                int selection = rd.nextInt(4);
+
+                TestVote valid = new TestVote(uniqueID, nextTestNum, selection, 0, phoneNum++);
+                testVotes.add(valid);
+                //add to listview
+                String disp = "Vote for " + selection;
+                adapter.add(disp);
+                adapter.notifyDataSetChanged();
             }
         });
 
-        addVote.setOnClickListener(new View.OnClickListener() {
+        addDup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: add random vote to seq and listview
+                if(list.size() == 0) return;
+                //String dup = list.get(0);
+                //int selection = Integer.parseInt(dup.substring(dup.lastIndexOf(dup)));
+                String uniqueID = UUID.randomUUID().toString();
+                TestVote duplicate = new TestVote(uniqueID, nextTestNum, 1, 2, phoneNum);
+                testVotes.add(duplicate);
+
+                String disp = "Duplicate Vote";
+                adapter.add(disp);
+                adapter.notifyDataSetChanged();
             }
         });
 
-        addStop.setOnClickListener(new View.OnClickListener() {
+        addInvalid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: add stop event to seq and listview
+                String uniqueID = UUID.randomUUID().toString();
+                TestVote invalid = new TestVote(uniqueID, nextTestNum, 5, 1, phoneNum++);
+                testVotes.add(invalid);
+
+                String disp = "Invalid Vote";
+                adapter.add(disp);
+                adapter.notifyDataSetChanged();
+
             }
         });
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+
+
+
                 //TODO: save sequence to phone - will run at load
 
 /*                String filename = "savedSequence";
@@ -99,7 +157,7 @@ public class MakeTestFragment extends Fragment {
                 }*/
 
                 //this will do to save one sequence
-                String fileContents = "Sample saved file";
+                //String fileContents = "Sample saved file";
 
 
 
@@ -118,12 +176,20 @@ public class MakeTestFragment extends Fragment {
 
 
 
-                SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", Context.MODE_PRIVATE);
+/*                SharedPreferences sharedPref = getContext().getSharedPreferences("savedSequence", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("savedSequence", fileContents);
-                editor.commit();
+                editor.commit();*/
 
-                getActivity().onBackPressed();
+                //getActivity().onBackPressed();
+
+
+                mtc.saveSeq(testVotes);
+
+                Fragment testing = new TestingFragment();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_frag_container, testing)
+                        .commit();
             }
         });
 

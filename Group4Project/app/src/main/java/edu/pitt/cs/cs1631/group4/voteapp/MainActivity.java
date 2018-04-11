@@ -1,11 +1,15 @@
 package edu.pitt.cs.cs1631.group4.voteapp;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
+import android.arch.persistence.db.SupportSQLiteOpenHelper;
+import android.arch.persistence.room.Room;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -27,16 +31,23 @@ import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ClientInfo;
 import edu.pitt.cs.cs1631.group4.voteapp.sisserver.ServerService;
 
-public class MainActivity extends AppCompatActivity implements StartVoteFragment.VotingContestant, ResultsFragment.TransferList {
+public class MainActivity extends AppCompatActivity implements StartVoteFragment.VotingContestant, ResultsFragment.TransferList, TestingFragment.TestingCom, MakeTestFragment.MakeTestCom{
 
 
     TextView statusText;
     TextView iptext;
     ArrayList<String> contestantList;
+    private boolean testing;
+    private ArrayList<TestVote> testTable;
+    TestDatabase db;
+    ArrayList<ArrayList<TestVote>> savedTables;
+    DatabaseAsync dbAsync;
 
 
     private ServerService serverService;
@@ -186,10 +197,49 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
         iptext = (TextView)findViewById(R.id.main_port_text);
         statusText = (TextView) findViewById(R.id.main_status_text);
 
+
+        db = (TestDatabase)Room.databaseBuilder(getApplicationContext(), TestDatabase.class, "testingDB")
+                .fallbackToDestructiveMigration()
+                .build();
+        //db = (TestDatabase)Room.databaseBuilder(getApplicationContext(), TestDatabase.class, "testingDB").build();
+        dbAsync = new DatabaseAsync();
+        dbAsync.execute();
+
+        savedTables = new ArrayList<ArrayList<TestVote>>();
+
+/*        SupportSQLiteOpenHelper helper = db.getOpenHelper();
+        SupportSQLiteDatabase database = helper.getWritableDatabase();*/
+
+
         Fragment home = new HomeFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_frag_container, home)
                 .commit();
+
+    }
+
+    private void makeDefault(TestingDao td) {
+
+        td.deleteSaved(0);
+
+        TestVote aVote;
+        //4 valid votes
+        for(int i = 0; i < 4; i++) {
+            String uniqueID = UUID.randomUUID().toString();
+            aVote = new TestVote(uniqueID, 0, i, 0, i);
+            td.insertTestVote(aVote);
+        }
+
+        //a double vote
+        String uniqueID = UUID.randomUUID().toString();
+        aVote = new TestVote(uniqueID, 0, 1, 2, 1);
+        td.insertTestVote(aVote);
+
+        //an invalid vote
+        uniqueID = UUID.randomUUID().toString();
+        aVote = new TestVote(uniqueID, 0, 5, 1, 5);
+        td.insertTestVote(aVote);
+
 
     }
 
@@ -292,7 +342,130 @@ public class MainActivity extends AppCompatActivity implements StartVoteFragment
     }
 
     @Override
+    public TestingDao getDB() {
+        return db.testingDao();
+    }
+
+    @Override
+    public boolean forTesting() {
+        return testing;
+    }
+
+    @Override
+    public ArrayList<TestVote> getTestTable() {
+        return testTable;
+    }
+
+    @Override
+    public void setTesting(boolean testing) {
+        this.testing = testing;
+    }
+
+    @Override
     public ArrayList<String> getContestantsList() {
         return this.contestantList;
+    }
+
+    @Override
+    public void setTestTable(int i) {
+        this.testTable=savedTables.get(i);
+    }
+
+    @Override
+    public int getNextTestCode() {
+
+        return dbAsync.nextTestNumber();
+    }
+
+    @Override
+    public void saveSeq(List<TestVote> votes) {
+        dbAsync = new DatabaseAsync();
+        dbAsync.saveSeq(votes);
+        dbAsync.execute();
+    }
+
+    private class DatabaseAsync extends AsyncTask<Void, Void, Void> {
+        TestingDao td;
+        boolean save = false;
+        List<TestVote> testVotes;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //Perform pre-adding operation here.
+        }
+
+        public void saveSeq(List<TestVote> testVotes) {
+/*            td.deleteSaved(1);
+            for(TestVote vote : testVotes) {
+                td.insertTestVote(vote);
+            }*/
+            this.testVotes = testVotes;
+            save=true;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            SupportSQLiteDatabase sd = db.getOpenHelper().getWritableDatabase();
+            td = db.testingDao();
+            if(save){
+                td.deleteSaved(1);
+                for(TestVote vote : testVotes) {
+                    td.insertTestVote(vote);
+                }
+                save = false;
+            }
+
+
+            List<TestVote> test;
+
+            makeDefault(td);
+
+            int i = 0;
+            while(true) {
+                try {
+                    test = new ArrayList<TestVote>(td.getSaved(i));
+                    if(test.size() == 0){
+                        //if(i == 1)makeDefault(td);
+                        break;
+                    }
+                    savedTables.add((ArrayList<TestVote>)test);
+                    i++;
+                } catch (Exception e) {
+                    //make the table
+                    //if(i==1)makeDefault(td);
+                    //else break;
+                    break;
+                }
+            }
+
+
+            //Let's add some dummy data to the database.
+            //University university = new University();
+            //university.setName("MyUniversity");
+
+            //College college = new College();
+            //college.setId(1);
+            //college.setName("MyCollege");
+
+            //university.setCollege(college);
+
+            //Now access all the methods defined in DaoAccess with sampleDatabase object
+            //sampleDatabase.daoAccess().insertOnlySingleRecord(university);
+
+            return null;
+        }
+
+        public int nextTestNumber(){
+            return td.getLastTestNum() + 1;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            //To after addition operation here.
+        }
     }
 }
